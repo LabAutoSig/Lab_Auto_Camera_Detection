@@ -2,7 +2,7 @@
 This GitHub repository is associated to our research Article: "Facilitating Laboratory Automation Using Robots: A Simple And Inexpensive Camera 
 Detection System" in Scientific Reports. For further information take a look at our research article (insert link here).
 
-## Abstract 
+## Our work 
 Laboratory automation has transformed bioanalytical research, yet smaller research laboratories face challenges in adopting such technologies due to limited resources, time, and technical expertise, while already facing complex bioanalytical methods. To address these barriers, we developed a robotic-arm-based camera detection system featuring two software applications designed to simplify laboratory automation. Both applications use fiducial markers (Augmented Reality University of Cordoba (ArUco)), for object detection. The first application creates a 3D digital model of the robot's environment using ArUco markers and a Python-based Open Computer Vision (OpenCV) simulated stereo vision setup, enabling automated computer-aided design (CAD) in FreeCAD. This facilitates safe and efficient robot arm navigation. The second application integrates a deep learning neural network for automated digital display recognition, achieving an error rate of 1.81 %, comparable to manual readings. By leveraging low-cost hardware and open-source software available on GitHub, the system is accessible to smaller research facilities, reducing programming complexity and enabling broader adoption of laboratory automation in bioanalytical workflows. This work demonstrates an affordable and effective solution for integrating robotic arms into scientific workflows, enhancing reproducibility and efficiency in bioanalytical research.
 
 ## Detection System Installation Guide
