@@ -1,0 +1,3 @@
+numpy == 1.26.2
+opencv-contrib-python == 4.8.1.78
+uuid == 1.30

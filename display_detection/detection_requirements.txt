@@ -1,0 +1,7 @@
+C:\Users\wienbruch\camera_detection_system\autoit-v3\install\AutoIt3.exe
+C:\Users\wienbruch\camera_detection_system\autoit-v3\install\SciTe\SciTe.exe
+wienbruch@hs-albsig.de
+MuRs2kskK
+C:\Users\wienbruch\camera_detection_system\display_detection\Enhanced_imgs\
+C:\Users\wienbruch\camera_detection_system\autoit-v3\install\msedgedriver.exe
+C:\Users\wienbruch\camera_detection_system\display_detection\Input_img\Variation_lighting\rawimg2.jpg
