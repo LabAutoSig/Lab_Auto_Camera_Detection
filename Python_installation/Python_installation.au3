@@ -14,8 +14,8 @@ RunWait('cmd.exe /c py -3.11 -m pip install virtualenv && py -3.11 -m virtualenv
 Sleep(100)
 MsgBox(0,"Finished", "The second installation is finished",1)
 
-;Python 3.11.2 for camera calibration
-MsgBox(0,"Python 3.11.2", "Start Python 3.12.0 installation",1)
+;Python 3.12.0 for camera calibration
+MsgBox(0,"Python 3.12.0", "Start Python 3.12.0 installation",1)
 Sleep(100)
 RunWait('cmd.exe /c py -3.12 -m pip install virtualenv && py -3.12 -m virtualenv venv312 && call venv312\Scripts\activate && py -m pip install -r requirements_camera_calibration.txt', '', @SW_MAXIMIZE)
 Sleep(100)

@@ -1,5 +1,5 @@
 #path to your FreeCAD.sp pr FreeCAD.pyd file
-with open('3d_reconstruction\FreeCAD_path.txt', 'r') as file:
+with open('3d_reconstruction\\FreeCAD_path.txt', 'r') as file:
         # Read the path from the file
         FREECADPATH = file.readline().strip()
 #______________________________________________
@@ -598,7 +598,7 @@ camera_matrix = [] #intrinsic camera matrix
 dist_coeffs = [] #distortion coefficients for the camera lense
 arucoDict = aruco.getPredefinedDictionary(aruco.DICT_4X4_1000)#define used aruco marker dicitonary
 #Load distortion coefficients and camera matrix from the npz file 
-with np.load(r'3d_reconstruction\Calibration\calibration_parameters.npz') as data:
+with np.load(r'3d_reconstruction\Calibration\calibration_parameters_new_images_27_11_v2_rasps.npz') as data:
     camera_matrix = data['camera_matrix'] #the data is saved under defined names 
     dist_coeffs = data['dist_coeffs']
 print(f"Calibration parameters:")
@@ -607,15 +607,15 @@ print(f"Camera intrinsic matrix: \n {camera_matrix} \n \n Distortion coefficient
 
 #_________Image 1___________
 #Load the first image --> change path
-img1 = cv2.imread(r'3d_reconstruction\input\image1.jpg')#modified
-camera_pose_file1 = r'3d_reconstruction\input\pos1.txt'#Load camera pose1 from txt files
+img1 = cv2.imread(r'3d_reconstruction\input\1.jpg')#modified
+camera_pose_file1 = r'3d_reconstruction\input\camera_pose1.txt'#Load camera pose1 from txt files
 #cv2.imshow("Img1 resized", cv2.resize(img1,(900,900)))
 # Get the image shape
 h1, w1 = img1.shape[:2] #get image height and width
 #_________Image 1___________
 #Load the second image --> change path
-img2 = cv2.imread(r'3d_reconstruction\input\image2.jpg')#modified
-camera_pose_file2 = r'3d_reconstruction\input\pos2.txt' #Load camera pose2 from txt files
+img2 = cv2.imread(r'3d_reconstruction\input\2.jpg')#modified
+camera_pose_file2 = r'3d_reconstruction\input\camera_pose2.txt' #Load camera pose2 from txt files
 #cv2.imshow("Img2 resized", cv2.resize(img2,(900,900)))
 # Get the image shape
 h2, w2 = img2.shape[:2] #get image height and width

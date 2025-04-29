@@ -3,8 +3,6 @@
 #include <Excel.au3>
 #include <Date.au3>
 ;Define variables to recieve measuring time and day -----------------------------------------------------------------------------------------
-Global $newdate = @MDAY & "." & @MON & "." & @YEAR ;measurement day	
-Global $newtime = _NowTime () ;measuring time hh:mm:ss
 Global $file
 Local $scitePath = $CmdLine[1]
 Global $csvfile = $CmdLine[2]
@@ -23,13 +21,6 @@ Send ($csvfile) ;Send output file path
 Sleep (200)
 Send("{ENTER}")
 Sleep (100)
-;Add time and date to output file--------------------------------------------------------------
-Send ($newdate & @CRLF)
-Sleep (200)
-Send ($newtime & @CRLF)
-Sleep (200)
-;Save output file ----------------------------------
-Send("^s")
 Local $sScriptFullPath = @ScriptFullPath
 Local $sCSVFullPath = StringLeft($sScriptFullPath, StringInStr($sScriptFullPath, "\", 0, -1)) & $csvfile
 
