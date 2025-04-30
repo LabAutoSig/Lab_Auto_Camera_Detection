@@ -5,14 +5,6 @@
 #1. Import the necessary libraries
 #______________________________________________
 import cv2
-import cv2.aruco as aruco 
-import numpy as np
-import imutils
-import uuid
-from ultralytics import YOLO
-import torch
-import pandas as pd
-import subprocess
 import sys
 #Import custom functions: 
 from display_detection.ArUco_finder import findArucoMarkers
@@ -73,7 +65,7 @@ if __name__ == "__main__":
     img = cv2.imread(img_path)
     #cv2.imshow("img",img)
     #Define the model path 
-    yolo_path = r"display_detection\Trained_model\Model_V10_best.pt"
+    yolo_path = r"display_detection\Trained_model\best.pt" #Model_V10_best.pt in folder Models is the best one and used here
     #Define where the images should be saved
     save_path = r'display_detection\Saved_Images\ '
     cropped_path = r'display_detection\Processed_imgs\cropped_img.jpg'

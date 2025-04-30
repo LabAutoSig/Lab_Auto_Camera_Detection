@@ -34,9 +34,9 @@ EndFunc
 
 #Region ### GUI definition $gui_task ###
 Opt("GUIOnEventMode",1)
-$gui_task = GUICreate("HORST Task Selector", 480, 389, 500, 200)
+$gui_task = GUICreate("Detection System Task Selector", 480, 389, 500, 200)
 GUISetBkColor(0x99B4D1)
-GUICtrlCreateLabel("Please provide the ID of Aruco's from left to right placed.",48,20,600,50)
+GUICtrlCreateLabel("Please provide the Aruco marker ID's as placed,from left to right.",48,20,600,50)
 GUICtrlSetFont(-1, 12, 300, 0, "MS Sans Serif")
 
 ;____________________________________SCAN Display________________________________________
@@ -90,7 +90,7 @@ GUICtrlSetState(-1, $GUI_disable)
 $check_simulation = GUICtrlCreateCheckbox("Simulation Mode", 128, 240, 161, 33)
 GUICtrlSetFont(-1, 12, 800, 0, "MS Sans Serif")
 GUICtrlSetColor(-1, 0x000000)
-#GUICtrlSetOnEvent(-1,"_simulation")
+GUICtrlSetOnEvent(-1,"_scan")
 
 ;__________________________________________________________________________________________
 $but_exe = GUICtrlCreateButton("execute", 128, 288, 177, 41)
@@ -114,97 +114,146 @@ Func end()
 	Exit
 EndFunc
 
+
 Func _scan()
-	If GUICtrlRead($check_scan) = $GUI_Checked Then
-		GUICtrlSetState($inp_scan1, $GUI_enable)
-		GUICtrlSetState($inp_scan2, $GUI_enable)
-		GUICtrlSetState($lab_scanid1, $GUI_enable)
-		GUICtrlSetState($lab_scanid2, $GUI_enable)
+	If GUICtrlRead($check_simulation) = $GUI_Checked Then
+		If GUICtrlRead($check_scan) = $GUI_Checked Then
+			GUICtrlSetState($inp_scan1, $GUI_disable)
+			GUICtrlSetState($inp_scan2, $GUI_disable)
+			GUICtrlSetState($lab_scanid1, $GUI_disable)
+			GUICtrlSetState($lab_scanid2, $GUI_disable)
 
-		GUICtrlSetState($check_map, $GUI_disable)
-		GUICtrlSetState($lab_mapid1, $GUI_disable)
-		GUICtrlSetState($lab_mapid2, $GUI_disable)
-		GUICtrlSetState($lab_mapid3, $GUI_disable)
-		GUICtrlSetState($inp_map1, $GUI_disable)
-		GUICtrlSetState($inp_map2, $GUI_disable)
-		GUICtrlSetState($inp_map3, $GUI_disable)
+			GUICtrlSetState($check_map, $GUI_disable)
+			GUICtrlSetState($lab_mapid1, $GUI_disable)
+			GUICtrlSetState($lab_mapid2, $GUI_disable)
+			GUICtrlSetState($lab_mapid3, $GUI_disable)
+			GUICtrlSetState($inp_map1, $GUI_disable)
+			GUICtrlSetState($inp_map2, $GUI_disable)
+			GUICtrlSetState($inp_map3, $GUI_disable)
 
-	ElseIf GUICtrlRead($check_scan) = $GUI_Unchecked Then
-		GUICtrlSetState($inp_scan1, $GUI_disable)
-		GUICtrlSetState($inp_scan2, $GUI_disable)
-		GUICtrlSetState($lab_scanid1, $GUI_disable)
-		GUICtrlSetState($lab_scanid2, $GUI_disable)
+		ElseIf GUICtrlRead($check_scan) = $GUI_Unchecked Then
+			GUICtrlSetState($inp_scan1, $GUI_disable)
+			GUICtrlSetState($inp_scan2, $GUI_disable)
+			GUICtrlSetState($lab_scanid1, $GUI_disable)
+			GUICtrlSetState($lab_scanid2, $GUI_disable)
 
-		GUICtrlSetState($check_map, $GUI_enable)
-		GUICtrlSetState($lab_mapid1, $GUI_disable)
-		GUICtrlSetState($lab_mapid2, $GUI_disable)
-		GUICtrlSetState($lab_mapid3, $GUI_disable)
-		GUICtrlSetState($inp_map1, $GUI_disable)
-		GUICtrlSetState($inp_map2, $GUI_disable)
-		GUICtrlSetState($inp_map3, $GUI_disable)
+			GUICtrlSetState($check_map, $GUI_enable)
+			GUICtrlSetState($lab_mapid1, $GUI_disable)
+			GUICtrlSetState($lab_mapid2, $GUI_disable)
+			GUICtrlSetState($lab_mapid3, $GUI_disable)
+			GUICtrlSetState($inp_map1, $GUI_disable)
+			GUICtrlSetState($inp_map2, $GUI_disable)
+			GUICtrlSetState($inp_map3, $GUI_disable)
+		EndIf
+	ElseIf GUICtrlRead($check_simulation) = $GUI_Unchecked Then
+		If GUICtrlRead($check_scan) = $GUI_Checked Then
+			GUICtrlSetState($inp_scan1, $GUI_enable)
+			GUICtrlSetState($inp_scan2, $GUI_enable)
+			GUICtrlSetState($lab_scanid1, $GUI_enable)
+			GUICtrlSetState($lab_scanid2, $GUI_enable)
+
+			GUICtrlSetState($check_map, $GUI_disable)
+			GUICtrlSetState($lab_mapid1, $GUI_disable)
+			GUICtrlSetState($lab_mapid2, $GUI_disable)
+			GUICtrlSetState($lab_mapid3, $GUI_disable)
+			GUICtrlSetState($inp_map1, $GUI_disable)
+			GUICtrlSetState($inp_map2, $GUI_disable)
+			GUICtrlSetState($inp_map3, $GUI_disable)
+
+		ElseIf GUICtrlRead($check_scan) = $GUI_Unchecked Then
+			GUICtrlSetState($inp_scan1, $GUI_disable)
+			GUICtrlSetState($inp_scan2, $GUI_disable)
+			GUICtrlSetState($lab_scanid1, $GUI_disable)
+			GUICtrlSetState($lab_scanid2, $GUI_disable)
+
+			GUICtrlSetState($check_map, $GUI_enable)
+			GUICtrlSetState($lab_mapid1, $GUI_disable)
+			GUICtrlSetState($lab_mapid2, $GUI_disable)
+			GUICtrlSetState($lab_mapid3, $GUI_disable)
+			GUICtrlSetState($inp_map1, $GUI_disable)
+			GUICtrlSetState($inp_map2, $GUI_disable)
+			GUICtrlSetState($inp_map3, $GUI_disable)
+		EndIf
 	EndIf
+
 EndFunc
 
 Func _map()
-	If GUICtrlRead($check_map) = $GUI_Checked Then
-		GUICtrlSetState($check_scan, $GUI_disable)
+	If GUICtrlRead($check_simulation) = $GUI_Checked Then
+		If GUICtrlRead($check_map) = $GUI_Checked Then
+			GUICtrlSetState($check_scan, $GUI_disable)
+			GUICtrlSetState($lab_mapid1, $GUI_disable)
+			GUICtrlSetState($lab_mapid2, $GUI_disable)
+			GUICtrlSetState($lab_mapid3, $GUI_disable)
+			GUICtrlSetState($inp_map1, $GUI_disable)
+			GUICtrlSetState($inp_map2, $GUI_disable)
+			GUICtrlSetState($inp_map3, $GUI_disable)
 
-		GUICtrlSetState($lab_mapid1, $GUI_enable)
-		GUICtrlSetState($lab_mapid2, $GUI_enable)
-		GUICtrlSetState($lab_mapid3, $GUI_enable)
-		GUICtrlSetState($inp_map1, $GUI_enable)
-		GUICtrlSetState($inp_map2, $GUI_enable)
-		GUICtrlSetState($inp_map3, $GUI_enable)
+			GUICtrlSetState($check_scan, $GUI_disable)
+			GUICtrlSetState($inp_scan1, $GUI_disable)
+			GUICtrlSetState($inp_scan2, $GUI_disable)
+			GUICtrlSetState($lab_scanid1, $GUI_disable)
+			GUICtrlSetState($lab_scanid2, $GUI_disable)
 
-		GUICtrlSetState($check_scan, $GUI_disable)
-		GUICtrlSetState($inp_scan1, $GUI_disable)
-		GUICtrlSetState($inp_scan2, $GUI_disable)
-		GUICtrlSetState($lab_scanid1, $GUI_disable)
-		GUICtrlSetState($lab_scanid2, $GUI_disable)
+		ElseIf GUICtrlRead($check_scan) = $GUI_Unchecked Then
+			GUICtrlSetState($inp_scan1, $GUI_disable)
+			GUICtrlSetState($inp_scan2, $GUI_disable)
+			GUICtrlSetState($lab_scanid1, $GUI_disable)
+			GUICtrlSetState($lab_scanid2, $GUI_disable)
 
-	ElseIf GUICtrlRead($check_scan) = $GUI_Unchecked Then
-		GUICtrlSetState($inp_scan1, $GUI_disable)
-		GUICtrlSetState($inp_scan2, $GUI_disable)
-		GUICtrlSetState($lab_scanid1, $GUI_disable)
-		GUICtrlSetState($lab_scanid2, $GUI_disable)
+			GUICtrlSetState($check_scan, $GUI_enable)
+			GUICtrlSetState($lab_mapid1, $GUI_disable)
+			GUICtrlSetState($lab_mapid2, $GUI_disable)
+			GUICtrlSetState($lab_mapid3, $GUI_disable)
+			GUICtrlSetState($inp_map1, $GUI_disable)
+			GUICtrlSetState($inp_map2, $GUI_disable)
+			GUICtrlSetState($inp_map3, $GUI_disable)
+		EndIf
+	ElseIf GUICtrlRead($check_simulation) = $GUI_Unchecked Then
+		If GUICtrlRead($check_map) = $GUI_Checked Then
+			GUICtrlSetState($check_scan, $GUI_disable)
 
-		GUICtrlSetState($check_scan, $GUI_enable)
-		GUICtrlSetState($lab_mapid1, $GUI_disable)
-		GUICtrlSetState($lab_mapid2, $GUI_disable)
-		GUICtrlSetState($lab_mapid3, $GUI_disable)
-		GUICtrlSetState($inp_map1, $GUI_disable)
-		GUICtrlSetState($inp_map2, $GUI_disable)
-		GUICtrlSetState($inp_map3, $GUI_disable)
-EndIf
+			GUICtrlSetState($lab_mapid1, $GUI_enable)
+			GUICtrlSetState($lab_mapid2, $GUI_enable)
+			GUICtrlSetState($lab_mapid3, $GUI_enable)
+			GUICtrlSetState($inp_map1, $GUI_enable)
+			GUICtrlSetState($inp_map2, $GUI_enable)
+			GUICtrlSetState($inp_map3, $GUI_enable)
+
+			GUICtrlSetState($check_scan, $GUI_disable)
+			GUICtrlSetState($inp_scan1, $GUI_disable)
+			GUICtrlSetState($inp_scan2, $GUI_disable)
+			GUICtrlSetState($lab_scanid1, $GUI_disable)
+			GUICtrlSetState($lab_scanid2, $GUI_disable)
+
+		ElseIf GUICtrlRead($check_scan) = $GUI_Unchecked Then
+			GUICtrlSetState($inp_scan1, $GUI_disable)
+			GUICtrlSetState($inp_scan2, $GUI_disable)
+			GUICtrlSetState($lab_scanid1, $GUI_disable)
+			GUICtrlSetState($lab_scanid2, $GUI_disable)
+
+			GUICtrlSetState($check_scan, $GUI_enable)
+			GUICtrlSetState($lab_mapid1, $GUI_disable)
+			GUICtrlSetState($lab_mapid2, $GUI_disable)
+			GUICtrlSetState($lab_mapid3, $GUI_disable)
+			GUICtrlSetState($inp_map1, $GUI_disable)
+			GUICtrlSetState($inp_map2, $GUI_disable)
+			GUICtrlSetState($inp_map3, $GUI_disable)
+		EndIf
+	EndIf
 EndFunc
 
 Func _execute()
-
 	If GUICtrlRead($check_simulation) = $GUI_Checked Then ;Execute AutoIt script without robotic arm usage
 		If GUICtrlRead($check_scan) = $GUI_Checked Then
-			If GUICtrlRead($inp_scan1) = "" Or GUICtrlRead($inp_scan2) = "" Then
-				MsgBox(0,"Incomplete information", "Please provide the ArUco marker IDs before continuing.")
-			Else
-				global $id1 = GUICtrlRead ($inp_scan1)
-				global $id2 = GUICtrlRead ($inp_scan2)
-				;MsgBox(0,"",$id1 & $id2)
-				GUISetState(@SW_HIDE)
-				displaydetection()
-				end()
-			EndIf
+			GUISetState(@SW_HIDE)
+			displaydetection()
+			end()
 
 		ElseIf GUICtrlRead($check_map) = $GUI_Checked Then
-			If GUICtrlRead($inp_map1) = "" Or GUICtrlRead($inp_map2) = "" Or GUICtrlRead($inp_map3) = "" Then
-				MsgBox(0,"Incomplete information", "Please provide the ArUco marker IDs before continuing.")
-			Else
-				global $id1 = GUICtrlRead ($inp_map1)
-				global $id2 = GUICtrlRead ($inp_map2)
-				global $id3 = GUICtrlRead ($inp_map3)
-				;MsgBox(0,"",$id1 & $id2 &$id3)
-				GUISetState(@SW_HIDE)
-				reconstruction()
-				end()
-			EndIf
+			GUISetState(@SW_HIDE)
+			reconstruction()
+			end()
 		EndIf
 
 	ElseIf GUICtrlRead($check_simulation) = $GUI_Unchecked Then ;Perform complete script with robot control
@@ -257,9 +306,6 @@ Func reconstruction()
     Local $venvPath = $basePath & "\Python_installation\venv38\Scripts\activate"
     Run(@ComSpec & ' /k "cd /d ' & $basePath & '\Python_installation && ' & $venvPath & ' && cd /d ' & $basePath & ' && reconstruction.py"', $basePath)
 	EndFunc
-
-
-
 #EndRegion
 
 
