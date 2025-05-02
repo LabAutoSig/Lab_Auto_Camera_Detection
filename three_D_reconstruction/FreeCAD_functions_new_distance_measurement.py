@@ -7,6 +7,14 @@ sys.path.append(FREECADPATH) #add FreeCAD path to system path
 import FreeCAD as App
 import Part
 #import Draft
+
+
+# Calculate real distances considering all cases
+def calculate_distance(a, b):
+    if (a < 0 and b > 0) or (a > 0 and b < 0):  # One negative, one positive
+        return abs(a) + abs(b)
+    else:  # Both positive or both negative
+        return abs(a - b)
 #______________________________________________
 #Function that creates a box part in FreeCAD
 #______________________________________________
@@ -30,45 +38,40 @@ def create_box(coord):
     pos = None
     width_y = 0
     height_z = 0
-
-    # Calculate real distances considering all cases
-    def calculate_distance(a, b):
-        if (a < 0 and b > 0) or (a > 0 and b < 0):  # One negative, one positive
-            return abs(a) + abs(b)
-        else:  # Both positive or both negative
-            return abs(a - b)
-
-    length_x = calculate_distance(r_x, l_x) + 50  # with safety distance
+    distances = []
+    length_x = calculate_distance(r_x, l_x)
+    distances.append(length_x)  # X distance
     if position == "L":  # ll ru
-        height_z = calculate_distance(r_z, t_z) + 50  # with safety distance
-        width_y = calculate_distance(r_y, l_y) + 50  # with safety distance
+        height_z = calculate_distance(r_z, t_z)
+        width_y = calculate_distance(r_y, l_y)
         print("L")
-        pos_x = (l_x * 10) - length_x
-        pos_y = (r_y * 10) - width_y
+        distances.append(width_y)
+        distances.append(height_z)
+        pos_x = ((l_x+50) * 1000) - length_x
+        pos_y = ((r_y+50) * 1000) - width_y
         pos = App.Base.Vector(pos_x, pos_y, t_z * 10)  # positioning vector in FreeCAD
     elif position == "U":  # rl lu
-        height_z = calculate_distance(l_z, t_z) + 50  # with safety distance
-        width_y = calculate_distance(l_y, r_y) + 50  # with safety distance
+        height_z = calculate_distance(l_z, t_z) 
+        width_y = calculate_distance(l_y, r_y)
         print("U")
-        pos_x = (r_x * 10)
-        pos_y = (r_y * 10)
-        pos = App.Base.Vector(pos_x, pos_y, table * 10)  # positioning vector in FreeCAD
-
-    print(f"length in x direction with safety distance = {length_x} mm")
-    print(f"width in y direction with safety distance = {width_y} mm")
-    print(f"height in z direction with safety distance = {height_z} mm")
-    print(f"length in x direction = {length_x - 50} mm")
-    print(f"width in y direction = {width_y - 50} mm")
-    print(f"height in z direction = {height_z - 50} mm")
-    print("Distances in x, y, and z directions:")
-    print(f"X = {calculate_distance(l_x, r_x)} mm")
-    print(f"Y = {calculate_distance(l_y, r_y)} mm")
-    print(f"Z = {calculate_distance(l_z, r_z)} mm")
+        distances.append(width_y)
+        distances.append(height_z)
+        pos_x = ((r_x+50) * 1000)
+        pos_y = ((r_y+50) * 1000)
+        pos = App.Base.Vector(pos_x, pos_y, table * 1000)  # positioning vector in FreeCAD
+    #add safety distance to the box dimensions
+    safety_distance = 50  # mm
+    safety_distances = distances.copy()  # Create a copy of distances for safety distance calculation
+    for i in range(len(distances)):
+        safety_distances[i] = distances[i] + 50
+    print(f"Dimensions in x,y,z direction without safety distance = {distances} mm")
+    print(f"Dimensions in x,y,z direction with safety distance = {safety_distances} mm")
+    
     # Open new Document from FreeCAD
     document = App.newDocument()  # open new Document from FreeCAD
     box = Part.makeBox(length_x, width_y, height_z, pos)  # make box part
     document.recompute()
-    return box
+    return box, distances
 
 def import_object_in_HORST_world(Horst_path, object_path, new_file_name):
     # Open the existing STEP file

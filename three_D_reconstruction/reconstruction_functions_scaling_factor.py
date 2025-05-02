@@ -152,6 +152,38 @@ def return_to_world(translation_original, point_local):
     #print(f"Point local adjusted to world coordinates: {point_local}")
     P_world = translation_original + point_local
     return P_world
+
+def measure_edges_by_axis(points_world):
+    # Ensure the input contains exactly four points
+    if len(points_world) != 4:
+        raise ValueError(f"Expected 4 points, but got {len(points_world)}. Input: {points_world}")
+    else:
+        print("Retrieving marker side lenghts...")
+        
+    print(f"Points in world coordinates: {points_world}")   
+    # Assumed order: LU, RU, RL, LL
+    LU, RU, RL, LL = points_world
+
+    # X-axis edges: LU–RU, LL–RL
+    x_edges = [np.linalg.norm(RU - LU), np.linalg.norm(RL - LL)]
+
+    # Y-axis edges: LU–LL, RU–RL
+    y_edges = [np.linalg.norm(LL - LU), np.linalg.norm(RL - RU)]
+
+    return x_edges, y_edges
+def scale_factors(marker_coordinates_3d, real_marker_size, x_lengths, y_lengths):
+    x_mean = np.mean(x_lengths)
+    y_mean = np.mean(y_lengths)
+    
+    x_scale = real_marker_size / x_mean if x_mean != 0 else 0  # Avoid division by zero
+    y_scale = real_marker_size / y_mean if y_mean != 0 else 0  # Avoid division by zero
+    z_scale = np.sqrt(x_scale * y_scale)      
+    print(f"X scale: {x_scale}, Y scale: {y_scale}, Z scale: {z_scale}")
+    marker_coordinates_3d = np.array(marker_coordinates_3d)  # Ensure it's a NumPy array
+    points_scaled = marker_coordinates_3d.copy()
+    points_scaled[:, 0] *= x_scale       # Keep X unchanged
+    points_scaled[:, 1] *= y_scale
+    return points_scaled
 #______________________________________________
 #Function that performs point triangulation to recreate the 3d coordinate points
 #______________________________________________
@@ -215,10 +247,9 @@ def stereoVision(ids1, ids2, num_ids1, num_ids2, bboxs1, bboxs2, image1, image2,
 
     # Initialize lists to store marker poses and their 3D coordinates
     marker_coordinates_3d = []
-    camera_differences =[]
     new_tvecs =[]
-    rvecs1 = []
-
+    x_lengths = []
+    y_lengths = []
     rvecs2 = []
     rmtx = []
 
@@ -267,40 +298,27 @@ def stereoVision(ids1, ids2, num_ids1, num_ids2, bboxs1, bboxs2, image1, image2,
 
         points3D_cartesian = points4D_homogeneous[:3,:] / points4D_homogeneous[3,:][np.newaxis,:]
         points3D = points3D_cartesian.T # Coordinates in cartesian coordinate system
-        
-
-
 
         # Convert to world coordinates
         points_world = return_to_world(tvec_cam1, points3D)
-        
-        # Calculate the measured size of the marker along each axis
-        measured_size_x = np.linalg.norm(points_world[0, 0] - points_world[1, 0])  # x-axis distance
-        measured_size_y = np.linalg.norm(points_world[0, 1] - points_world[2, 1])  # y-axis distance
-        measured_size_z = np.linalg.norm(points_world[0, 2] - points_world[1, 2])  # z-axis distance
 
-        # Calculate the scaling factors for each axis
-        scaling_factor_x = real_marker_size / measured_size_x
-        scaling_factor_y = real_marker_size / measured_size_y
-        scaling_factor_z = np.sqrt(scaling_factor_x * scaling_factor_y) #real_marker_size / measured_size_z
-
-        print(f"Scaling factors for marker {common_id}: X={scaling_factor_x}, Y={scaling_factor_y}, Z={scaling_factor_z}")
-
-        # Apply the scaling factors to the 3D points
-        pointsworld_scaled = points_world.copy()
-        print(f"Points world before scaling: {pointsworld_scaled}")
-        pointsworld_scaled[:, 0] *= scaling_factor_x
-        pointsworld_scaled[:, 1] *= scaling_factor_y
-        pointsworld_scaled[:, 2] *= scaling_factor_z
-        print(f"Points world after scaling: {pointsworld_scaled}")
-
+        #pointsworld_scaled = scale_points(points_world, real_marker_size, common_id)
+        x_edges, y_edges = measure_edges_by_axis(points_world)
+        x_lengths.append(x_edges)
+        y_lengths.append(y_edges)
+        print(f"X lengths: {x_edges}")
+        print(f"Y lengths: {y_edges}")
         # Append the scaled world coordinates
-        marker_coordinates_3d.append(pointsworld_scaled)
-
+        #marker_coordinates_3d.append(pointsworld_scaled)
+        marker_coordinates_3d.append(points_world)
+    print(f"Marker coordinates in world coordinates: {marker_coordinates_3d}")
+    print(f"Real marker size: {real_marker_size} mm")
+    points_scaled = scale_factors(marker_coordinates_3d,real_marker_size, x_lengths,y_lengths)
+    
     num_ids = len(ids) # returns the number of common ids
     print("--"*30)
     
-    return ids, num_ids, marker_coordinates_3d, new_tvecs, rvecs2, rmtx
+    return ids, num_ids, marker_coordinates_3d, points_scaled, new_tvecs, rvecs2, rmtx
 #Function that identifies the corners of the ArUco markers
 def identify_ArUco_corners(coord):
     lu = coord[0]
@@ -361,77 +379,70 @@ def sort_ArUco_placement(lu_a,ll_a,ru_a,rl_a,lu_b,ll_b,ru_b,rl_b, id_a, id_b):
             a.append(ru_a)
             a.append("L") #identifier for ll and ru
     return a
+def process_Coords(id, coord, scaled, new_tvecs, rvecs, marker_length,
+                  camera_matrix, dist_coeffs, image):
+    # Draw the coordinate frame axes on the image for each marker
+    image = cv2.drawFrameAxes(image, camera_matrix, dist_coeffs, rvecs,
+                    new_tvecs, marker_length * 0.5)
+    print(f"Coordinates ID:{id}")
+    lu, ru, rl, ll = identify_ArUco_corners(coord)
+    lu_scaled, ru_scaled, rl_scaled, ll_scaled = identify_ArUco_corners(scaled)
+    return lu,ru,rl,ll,lu_scaled,ru_scaled,rl_scaled,ll_scaled
 #______________________________________________
 #Function that sorts the 3d coordinates in the world coordinate system
 #______________________________________________
-def getCoords(ids,num_ids,coords_3d,new_tvecs, rvecs, rmtx, marker_length,
+def getCoords(ids,num_ids,table_marker_id, coords_3d,scaled_coords, new_tvecs, rvecs, rmtx, marker_length,
               camera_matrix, dist_coeffs, image, horst_file, object_file, save_file):
     #Define the variables
     box_coords = [] # array for the cad coordinates
-    if num_ids >= 1: #if there are more than or one marker
-        id1 = ids[0]
+    if num_ids == 3: #if there is more than or one marker
         coord1 = coords_3d[0]
-        # Draw the coordinate frame axes on the image for marker 1
-        image = cv2.drawFrameAxes(image, camera_matrix, dist_coeffs, rvecs[0],
-                                  new_tvecs[0], marker_length * 0.5)
-        print(f"Coordinates ID1:{id1} ")
-        #Identify left uppper = lu, right upper = ru, right lower = rl,
-        #left lower = ll corners
-        lu_id1,ru_id1,rl_id1,ll_id1 = identify_ArUco_corners(coord1)
-        
-        if num_ids >= 2: #if there are more than or exactly two markers
-            id2 = ids[1]
-            coord2 = coords_3d[1]
-            # Draw the coordinate frame axes on the image for marker 1
-            image = cv2.drawFrameAxes(image, camera_matrix, dist_coeffs, rvecs[1],
-                                      new_tvecs[1], marker_length * 0.5)
-            print(f"Coordinates ID2:{id2}")
-            lu_id2,ru_id2,rl_id2,ll_id2 = identify_ArUco_corners(coord2)
-            
-            if num_ids >= 3: #if there are more than or exactly three markers
-                id3 = ids[2]
-                coord3 = coords_3d[2]
-                # Draw the coordinate frame axes on the image for marker 1
-                image = cv2.drawFrameAxes(image, camera_matrix, dist_coeffs, rvecs[2],
-                                          new_tvecs[2], marker_length * 0.5)
-                print(f"Coordinates ID3:{id3} ")
-                lu_id3,ru_id3,rl_id3,ll_id3 = identify_ArUco_corners(coord3)
-                
-                if num_ids >= 4: #if there are more than or exactly four markers
-                    print("Too many markers detected, adjust scanning process...")
-                #______________________________________________________
-                #if there are only three markers prepare for drawing a box
-                #a later implemenation with four markers for round objects is possible
-                #______________________________________________________
-                elif num_ids == 3: # if no id4 == rectangle                    
-                    #Use the right upper/right lower marker coordinates of the right marker
-                    #Use the left lower/left upper marker coordinates of the left marker
-                    #______________________________________________________________
-                    #ID of the table marker has to be known for this state of the code
-                    #______________________________________________________________
-                    if id1 == 314: #identify marker with the value 23
-                        #id1 = table marker --> distance between id2/id3 and id1 for height
-                        print(f"ID{id1} = table marker")
-                        box_coords = sort_ArUco_placement(lu_id2,ll_id2,ru_id2,rl_id2,lu_id3,ll_id3,ru_id3,rl_id3, id2, id3)
-                        box_coords.append(coord1) #append table marker coordinates
-
-                    elif id2 == 314: #identify marker with the value 23
-                        #id2 = table marker --> distance between id1/id3 and id2 = height
-                        print(f"ID{id2} = table marker")
-                        box_coords = sort_ArUco_placement(lu_id1,ll_id1,ru_id1,rl_id1,lu_id3,ll_id3,ru_id3,rl_id3, id1, id3)
-                        box_coords.append(coord2) #append table marker coordinates
-   
-                    elif id3 == 314: #identify marker with the value 23
-                        #id3 = table marker --> distance between id1/id2 and id3 = height
-                        print(f"ID{id3} = table marker")
-                        box_coords = sort_ArUco_placement(lu_id1,ll_id1,ru_id1,rl_id1,lu_id2,ll_id2,ru_id2,rl_id2, id1, id2)
-                        box_coords.append(coord3) #append table marker coordinates
-
-                    box = create_box(box_coords) #Use coordinates to create a box
-                    box.exportStep("test.stp")#export the created box as a STEP file
-                    import_object_in_HORST_world(horst_file, object_file, save_file)
+        coord2 = coords_3d[1]
+        coord3 = coords_3d[2]
+        id1 = ids[0]
+        id2 = ids[1]
+        id3 = ids[2]
+        scaled1 = scaled_coords[0]
+        scaled2 = scaled_coords[1]  
+        scaled3 = scaled_coords[2] #id, coord, scaled, new_tvecs, rvecs, marker_length, camera_matrix, dist_coeffs, image
+        lu_id1, ru_id1, rl_id1, ll_id1, lu_id1_scaled, ru_id1_scaled, rl_id1_scaled, ll_id1_scaled = process_Coords(id1, coord1, scaled1, new_tvecs[0], rvecs[0], marker_length, camera_matrix, dist_coeffs, image)
+        lu_id2, ru_id2, rl_id2, ll_id2, lu_id2_scaled, ru_id2_scaled, rl_id2_scaled, ll_id2_scaled = process_Coords(id2, coord2, scaled2, new_tvecs[1], rvecs[1], marker_length,camera_matrix, dist_coeffs, image)
+        lu_id3, ru_id3, rl_id3, ll_id3, lu_id3_scaled, ru_id3_scaled, rl_id3_scaled, ll_id3_scaled = process_Coords(id3, coord3, scaled3, new_tvecs[2], rvecs[2], marker_length,camera_matrix, dist_coeffs, image)
+                        
+        #Use the right upper/right lower marker coordinates of the right marker
+        #Use the left lower/left upper marker coordinates of the left marker
+        #______________________________________________________________
+        #ID of the table marker has to be known for this state of the code
+        #______________________________________________________________
+        if id1 == table_marker_id: #identify marker with the value 23
+            #id1 = table marker --> distance between id2/id3 and id1 for height
+            print(f"ID{id1} = table marker")
+            box_coords = sort_ArUco_placement(lu_id2,ll_id2,ru_id2,rl_id2,lu_id3,ll_id3,ru_id3,rl_id3, id2, id3)
+            box_coords.append(coord1) #append table marker coordinates
+            box_scaled_coords = sort_ArUco_placement(lu_id2_scaled,ll_id2_scaled,ru_id2_scaled,rl_id2_scaled,lu_id3_scaled,ll_id3_scaled,ru_id3_scaled,rl_id3_scaled, id2, id3)
+            box_scaled_coords.append(scaled1) #append table marker coordinates
+        elif id2 == table_marker_id: #identify marker with the value 23
+            #id2 = table marker --> distance between id1/id3 and id2 = height
+            print(f"ID{id2} = table marker")
+            box_coords = sort_ArUco_placement(lu_id1,ll_id1,ru_id1,rl_id1,lu_id3,ll_id3,ru_id3,rl_id3, id1, id3)
+            box_coords.append(coord1) #append table marker coordinates
+            box_scaled_coords = sort_ArUco_placement(lu_id1_scaled,ll_id1_scaled,ru_id1_scaled,rl_id1_scaled,lu_id3_scaled,ll_id3_scaled,ru_id3_scaled,rl_id3_scaled, id1, id3)
+            box_scaled_coords.append(scaled1) #append table marker coordinates
+        elif id3 == table_marker_id: #identify marker with the value 23
+            #id3 = table marker --> distance between id1/id2 and id3 = height
+            print(f"ID{id3} = table marker")
+            box_coords = sort_ArUco_placement(lu_id1,ll_id1,ru_id1,rl_id1,lu_id2,ll_id2,ru_id2,rl_id2, id1, id2)
+            box_coords.append(coord2) #append table marker coordinates
+            box_scaled_coords = sort_ArUco_placement(lu_id1_scaled,ll_id1_scaled,ru_id1_scaled,rl_id1_scaled,lu_id2_scaled,ll_id2_scaled,ru_id2_scaled,rl_id2_scaled, id1, id2)
+            box_scaled_coords.append(scaled2)
+        box, distances = create_box(box_coords) #Use coordinates to create a box
+        box_scaled, distances_scaled = create_box(box_scaled_coords)
+        box.exportStep("test.stp")#export the created box as a STEP file
+        import_object_in_HORST_world(horst_file, object_file, save_file)
+    elif num_ids>3: 
+        print("More than 3 markers detected. Please check the images.")
     else: #if no markers are detected
         print("No markers detected.")
 
-    return box_coords,image
+    return box_coords,scaled_coords,image, distances, distances_scaled
 
