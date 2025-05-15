@@ -59,7 +59,7 @@ Download FreeCAD from the [official FreeCAD website](https://www.freecadweb.org/
 ### 5. User-Specific Path Updates
 
 Update the following files with your specific paths:
-- `display_detection\detection_requirements.txt`: Update with your Cutout.pro credentials, input image path, and enhanced image save path.
+- `display_detection\detection_requirements.txt`: Update with your Cutout.pro credentials.
 - `3D_reconstruction\FreeCad_path.txt`: Update with the FreeCAD bin folder path.
 
 Refer to the detailed instructions in the original guide for further customization.
