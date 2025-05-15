@@ -6,12 +6,13 @@
 #______________________________________________
 import cv2
 import sys
+import csv
+import traceback
 #Import custom functions: 
 from display_detection.ArUco_finder import findArucoMarkers
 from display_detection.Marker_sorting import sorted_corners
 from display_detection.Image_processer import processImage
 from display_detection.Yolo_prediction import yoloPredict
-
 
 def main_script():
     id_list = [1, 2, 3, 4, 5, 8, 42, 161, 314]
@@ -47,6 +48,9 @@ def run_with_error_control():
             if error_count < 2:
                 print("Error occurred, restarting script...")
             else:
+                exc_type, exc_value, exc_traceback = sys.exc_info()
+                traceback_details = ''.join(traceback.format_exception(exc_type, exc_value, exc_traceback))
+                print(traceback_details)
                 with open(output_path, mode='w', newline='') as file:
                     writer = csv.writer(file)
                     writer.writerow(["Error. Script failure"])
@@ -74,4 +78,3 @@ if __name__ == "__main__":
     #___________Load Data_____________________
     marker_length = 0.025 #aruco marker side length
     run_with_error_control()
-

@@ -31,11 +31,11 @@ def findArucoMarkers(img,img_folder_path, id_list, totalMarkers=1000, draw = Fal
         ids = None
         image_enhanced = run_image_enhancer(img_folder_path) #enhance image if at least one marker was not detected
         image_return = cv2.resize(image_enhanced, (new_width, new_height)) #resize enhanced image
-        cv2.imshow("Enhanced image", resized_enhanced) #show enhanced image
-        gray_enhanced = cv2.cvtColor(resized_enhanced, cv2.COLOR_BGR2GRAY)#transform image into grayscale for marker detection
+        cv2.imshow("Enhanced image", image_return) #show enhanced image
+        gray_enhanced = cv2.cvtColor(image_return, cv2.COLOR_BGR2GRAY)#transform image into grayscale for marker detection
         bboxs, ids, _ = aruco.detectMarkers(gray_enhanced, arucoDict, parameters = arucoParam) #retrieve marker corner coordinates and IDs after enhancement
         if draw: #if drwa parameter is True draw detected IDs and corners into image
-            aruco.drawDetectedMarkers(resized_enhanced, bboxs, ids) #Draw image with detected ids and bboxs
+            aruco.drawDetectedMarkers(image_return bboxs, ids) #Draw image with detected ids and bboxs
             #cv2.imshow("Markers",resized_enhanced)
     elif len(bboxs) > 2: #if more than two markers were detected try to correct the data
         print("Too many markers detected. Identify defined ids")

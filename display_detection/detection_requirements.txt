@@ -1,6 +1,2 @@
-C:\Users\wienbruch\camera_detection_system\autoit-v3\install\AutoIt3.exe
-wienbruch@hs-albsig.de
-123456
-C:\Users\wienbruch\camera_detection_system\display_detection\Enhanced_imgs\
-C:\Users\wienbruch\camera_detection_system\autoit-v3\install\msedgedriver.exe
-C:\Users\wienbruch\camera_detection_system\display_detection\Input_img\rawimg.jpg
+email@email.com
+password

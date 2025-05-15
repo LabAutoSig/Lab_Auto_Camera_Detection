@@ -33,26 +33,15 @@ def yoloPredict(croppedimg, path, savepath,ids, cropped_path, output_path):
     if len(results) == 0:
         print("No predictions were made. Enhance the cropped image")
         image_enhanced = run_image_enhancer(cropped_path)
-
-    #don't save and show predicted image,save txt file
-    # results saves predictions as labels
     res_plotted = results[0].plot(font_size=0.1, conf=False)
     #show plotted img, font size = text size, conf = confidence level
-
-    #new_width = 300
-    #new_height = 200
-    #res = cv2.resize(res_plotted, (new_width, new_height))
     cv2.imshow("result", res_plotted)
-    
-
     # Filename --> change path depending on your location
     filename = savepath + 'result_' + str(uuid.uuid4()) + '.jpg' #save image under random name
     # Save the image
     cv2.imwrite(filename, res_plotted) #save image
-
     #Define the variables
     b =[]
-    #bn = []
     conf = []
     classes = []
     names = []
@@ -60,19 +49,14 @@ def yoloPredict(croppedimg, path, savepath,ids, cropped_path, output_path):
     #Extract results and save as numpy arrays
     for result in results:
         # detection
-        #b = result.boxes.xyxy[0]   # box with xyxy format, (N, 4)
-        #b = result.boxes.xywh   # box with xywh format, (N, 4)
         b = result.boxes.xyxyn  # box with xyxy format but normalized, (N, 4)
-        #bn = result.boxes.xywhn  # box with xywh format but normalized, (N, 4)
         conf = result.boxes.conf   # confidence score, (N, 1)
         classes = result.boxes.cls    # cls, (N, 1)
-
         #convert values to numpy arrays
         b = b.numpy()
         #bn = bn.numpy()
         conf = conf.numpy()
         classes = classes.numpy()
-        
         for c in result.boxes.cls: #Extract class names 
             n = model.names[int(c)] # Convert names to integers
             names.append(n) #Append Names to list names
@@ -80,7 +64,6 @@ def yoloPredict(croppedimg, path, savepath,ids, cropped_path, output_path):
     #________________________________________________________________________
     # Sort and correct data
     #________________________________________________________________________
-
     #Build a dataframe
     df = pd.DataFrame(zip(names,classes,conf,b),columns=['Names','Classes',
                                                             'Confidence Interval',
@@ -88,11 +71,9 @@ def yoloPredict(croppedimg, path, savepath,ids, cropped_path, output_path):
     if df.empty:
         print("No values predicted/detected")
         print("Enhance image...")
-        #cropped_path = r'C:\Users\wienbruch\venv311\Display_detection_system_11_23\cropped_img.jpg'
         image_enhanced = run_image_enhancer(cropped_path)
         values = None
         return values
-    
     #Split Coordinate column into separate x and y columns
     df['x_top'],df['y_top'],df['x_bottom'],df['y_bottom'] = zip(*list(df['XYXYn'].values))
     df_letters = df
@@ -103,12 +84,8 @@ def yoloPredict(croppedimg, path, savepath,ids, cropped_path, output_path):
                        'Smiley','Stern','Time','U',]
     df_letters = df_letters[~df_letters['Names'].isin(words_to_remove)]
     #print(f" Dataframe without string values: \n {df_letters}")
-
-    
     df_letters = df_letters.replace('dot', '.', regex=True) #replace dot with .
     print(f"Dataframe with . instead of dot: \n {df_letters}")
-
-    
     #Sort the dataframe values by the position of the bounding boxes in the picture
     df_new = df_letters.sort_values(by =['x_top'], ascending = True)
     df_new = df_new.reset_index(drop=True) # reset indexes 
@@ -121,7 +98,6 @@ def yoloPredict(croppedimg, path, savepath,ids, cropped_path, output_path):
     
     #_____________Split values when there are two rows______________________
     dataframe1, dataframe2 = row_h.check_row(df_new)
-
     if not dataframe1.empty:
         print(f"Sort data again, df1: {dataframe1}")
         #Sort the dataframe values by the position of the bounding boxes in the picture
@@ -135,11 +111,6 @@ def yoloPredict(croppedimg, path, savepath,ids, cropped_path, output_path):
         dataframe2 = dataframe2.reset_index(drop=True) # reset indexes
         print(f"Sorted df2: {dataframe2}")
         dataframe2 = point_h.drop_firstPoint(dataframe2)
-
-       
-    # Filter out rows with Confidence Interval smaller than 0.5
-    #dataframe1 = dataframe1[dataframe1['Confidence Interval'] >= 0.5]
-    #dataframe1 = dataframe1.reset_index(drop=True)  # Reset indexes
     if dataframe1.empty:
         dataframe1_new = dataframe2
         dataframe2 = dataframe1
@@ -150,7 +121,6 @@ def yoloPredict(croppedimg, path, savepath,ids, cropped_path, output_path):
         #print(f"Dataframe 1 empty: \n {dataframe1}")
     print(f"Split dataframe 1: \n {dataframe1}")
     print(f"Split dataframe 2: \n {dataframe2}")
-  
 
     #_________________Single row: Split data if there is a gap greater than the threshold_________________________
     if dataframe2.empty: #if there is no data in dataframe2
@@ -158,9 +128,7 @@ def yoloPredict(croppedimg, path, savepath,ids, cropped_path, output_path):
         dataframe1 = dataframe1.sort_values(by =['x_bottom'], ascending = True)
         dataframe1 = dataframe1.reset_index(drop=True) # reset indexes
         dataframe1, dataframe2 = row_h.split_gap_single_row(dataframe1)
-        
     #___________Correct data if two bounding boxes are nearly equal__________________
-    
     dataframe1 = bbox_h.nearly_equal_bboxs(dataframe1)
     dataframe1 = point_h.drop_twin_point(dataframe1)
     if len(dataframe1) == 1 and dataframe1["Names"][0] == "OFF":
@@ -174,37 +142,24 @@ def yoloPredict(croppedimg, path, savepath,ids, cropped_path, output_path):
             value1 = float(''.join(map(str, dataframe1['Names'])))
     else:
         value1 = float(''.join(map(str, dataframe1['Names'])))
-    
-    #Save value1 as float --> join all values of names
+        #Save value1 as float --> join all values of names
     values.append(value1) #Append value1 to values
-    #print(f"DATAFrame2 : {dataframe2}")
-    
     if not dataframe2.empty: # when there are two rows
         #d_names2 = df2_dropped["Names"]
         dataframe2 = bbox_h.nearly_equal_bboxs(dataframe2)
         dataframe2 = point_h.drop_twin_point(dataframe2)
-        
-        #print("Corrected dataframe 2 for nearly equal bounding boxes: \n {dataframe2}")
         if dataframe2["Names"][0] != "OFF":
             value2 = float(''.join(map(str, dataframe2['Names'])))
+            #save value 2 as float --> join all values of names
         else:
             value2 = None
-        #save value 2 as float --> join all values of names
     elif dataframe2.empty:
         value2 = None
     print("First value: ", value1)
     print("Second value: ",value2)
-    #f.write(f"{value2} °C \n")
-    #f.write(f"{value2}\n")
     values.append(value2) #append value2 to values
-        
-
-        
     #_________________Data correction: inspect data for missing/false points and data________________________
-            
-    #print(f"Dataframes before correction: df1 \n {dataframe1} \n df2 \n {dataframe2}")
     df1,df2 = d_control.control_data(ids,dataframe1,dataframe2, values)
-    #print(f"Controlled data: \n {df1} and \n {df2}")
     value1 = float(''.join(map(str, df1["Names"]))) #join Name values 0 till j as float
     if not len(df2) == 0:
         value2 = float(''.join(map(str, df2["Names"]))) #join Name values j and the rest as float
@@ -214,7 +169,6 @@ def yoloPredict(croppedimg, path, savepath,ids, cropped_path, output_path):
     values_corrected.append(value1)
     values_corrected.append(value2)
     combined_dataframe = pd.concat([df1[['Names', 'Confidence Interval']], df2[['Names', 'Confidence Interval']]], ignore_index=False)
-    combined_df = pd.concat([df1[['Names', 'Confidence Interval']], df2[['Names', 'Confidence Interval']]], ignore_index=False)
     ids_df = pd.DataFrame(ids, columns = ["IDs"])
     results_df = pd.DataFrame(values_corrected, columns=["Predicted values"])
     print(f"Results df: {results_df}")

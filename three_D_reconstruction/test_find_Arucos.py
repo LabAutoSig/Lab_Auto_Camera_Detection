@@ -36,8 +36,8 @@ def main():
 
     #_________Image 1___________
     #Load the first image --> change path
-    img = cv2.imread(r'three_D_reconstruction\input\test.jpg')#modified
-    camera_pose_file1 = r'three_D_reconstruction\input\camera_pose1.txt'#Load camera pose1 from txt files
+    img = cv2.imread(r'three_D_reconstruction\input\05_05_2025_tecan_m_plex\2.jpg')#modified
+    camera_pose_file1 = r'rthree_D_reconstruction\input\05_05_2025_tecan_m_plex\camera_pose2.txt'#Load camera pose1 from txt files
     #cv2.imshow("Img1 resized", cv2.resize(img1,(900,900)))
     # Get the image shape
     h1, w1 = img.shape[:2] #get image height and width
