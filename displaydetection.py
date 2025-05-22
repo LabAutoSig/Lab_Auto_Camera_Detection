@@ -9,10 +9,10 @@ import sys
 import csv
 import traceback
 #Import custom functions: 
-from display_detection.ArUco_finder import findArucoMarkers
-from display_detection.Marker_sorting import sorted_corners
-from display_detection.Image_processer import processImage
-from display_detection.Yolo_prediction import yoloPredict
+from display_detection.Py_scripts.ArUco_finder import findArucoMarkers
+from display_detection.Py_scripts.Marker_sorting import sorted_corners
+from display_detection.Py_scripts.Image_processer import processImage
+from display_detection.Py_scripts.Yolo_prediction import yoloPredict
 
 def main_script():
     id_list = [1, 2, 3, 4, 5, 8, 42, 161, 314]

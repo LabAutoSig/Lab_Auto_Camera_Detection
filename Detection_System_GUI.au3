@@ -73,7 +73,7 @@ $lab_mapid2 = GUICtrlCreateLabel("2. ID", 250, 152, 38, 24)
 GUICtrlSetFont(-1, 12, 400, 0, "MS Sans Serif")
 GUICtrlSetColor(-1, 0x000000)
 
-$lab_mapid3 = GUICtrlCreateLabel("3. ID", 250, 192, 38, 24)
+$lab_mapid3 = GUICtrlCreateLabel("3. ID = Table marker", 250, 192, 38, 24)
 GUICtrlSetFont(-1, 12, 400, 0, "MS Sans Serif")
 GUICtrlSetColor(-1, 0x000000)
 
@@ -99,7 +99,9 @@ GUICtrlSetColor(-1, 0x000000)
 GUICtrlSetOnEvent(-1,"_execute")
 
 GUISetOnEvent($GUI_EVENT_CLOSE,"end")
-
+GUICtrlSetOnEvent($check_simulation, "UpdateGUIState")
+GUICtrlSetOnEvent($check_map, "UpdateGUIState")
+GUICtrlSetOnEvent($check_scan, "UpdateGUIState")
 GUISetState(@SW_SHOW)
 #EndRegion ### END Koda GUI section ###
 
@@ -179,16 +181,16 @@ Func _scan()
 EndFunc
 
 Func _map()
+	#cs
 	If GUICtrlRead($check_simulation) = $GUI_Checked Then
 		If GUICtrlRead($check_map) = $GUI_Checked Then
 			GUICtrlSetState($check_scan, $GUI_disable)
 			GUICtrlSetState($lab_mapid1, $GUI_disable)
 			GUICtrlSetState($lab_mapid2, $GUI_disable)
-			GUICtrlSetState($lab_mapid3, $GUI_disable)
+			GUICtrlSetState($lab_mapid3, $GUI_enable)
 			GUICtrlSetState($inp_map1, $GUI_disable)
 			GUICtrlSetState($inp_map2, $GUI_disable)
-			GUICtrlSetState($inp_map3, $GUI_disable)
-
+			GUICtrlSetState($inp_map3, $GUI_enable)
 			GUICtrlSetState($check_scan, $GUI_disable)
 			GUICtrlSetState($inp_scan1, $GUI_disable)
 			GUICtrlSetState($inp_scan2, $GUI_disable)
@@ -241,6 +243,112 @@ Func _map()
 			GUICtrlSetState($inp_map3, $GUI_disable)
 		EndIf
 	EndIf
+	#ce
+	Local $sim = GUICtrlRead($check_simulation)
+	Local $map = GUICtrlRead($check_map)
+	Local $scan = GUICtrlRead($check_scan)
+
+	If $sim = $GUI_Checked And $map = $GUI_Checked Then
+		; Only allow map3 inputs
+		GUICtrlSetState($lab_mapid1, $GUI_DISABLE)
+		GUICtrlSetState($lab_mapid2, $GUI_DISABLE)
+		GUICtrlSetState($lab_mapid3, $GUI_ENABLE)
+
+		GUICtrlSetState($inp_map1, $GUI_DISABLE)
+		GUICtrlSetState($inp_map2, $GUI_DISABLE)
+		GUICtrlSetState($inp_map3, $GUI_ENABLE)
+
+		GUICtrlSetState($check_scan, $GUI_DISABLE)
+		GUICtrlSetState($inp_scan1, $GUI_DISABLE)
+		GUICtrlSetState($inp_scan2, $GUI_DISABLE)
+		GUICtrlSetState($lab_scanid1, $GUI_DISABLE)
+		GUICtrlSetState($lab_scanid2, $GUI_DISABLE)
+
+	ElseIf $sim = $GUI_Unchecked And $map = $GUI_Checked Then
+		; Allow all map inputs
+		GUICtrlSetState($lab_mapid1, $GUI_ENABLE)
+		GUICtrlSetState($lab_mapid2, $GUI_ENABLE)
+		GUICtrlSetState($lab_mapid3, $GUI_ENABLE)
+
+		GUICtrlSetState($inp_map1, $GUI_ENABLE)
+		GUICtrlSetState($inp_map2, $GUI_ENABLE)
+		GUICtrlSetState($inp_map3, $GUI_ENABLE)
+
+		GUICtrlSetState($check_scan, $GUI_DISABLE)
+		GUICtrlSetState($inp_scan1, $GUI_DISABLE)
+		GUICtrlSetState($inp_scan2, $GUI_DISABLE)
+		GUICtrlSetState($lab_scanid1, $GUI_DISABLE)
+		GUICtrlSetState($lab_scanid2, $GUI_DISABLE)
+
+	Else
+		; Default case: disable all map + scan, enable scan checkbox if sim is unchecked
+		GUICtrlSetState($lab_mapid1, $GUI_DISABLE)
+		GUICtrlSetState($lab_mapid2, $GUI_DISABLE)
+		GUICtrlSetState($lab_mapid3, $GUI_DISABLE)
+
+		GUICtrlSetState($inp_map1, $GUI_DISABLE)
+		GUICtrlSetState($inp_map2, $GUI_DISABLE)
+		GUICtrlSetState($inp_map3, $GUI_DISABLE)
+
+		GUICtrlSetState($inp_scan1, $GUI_DISABLE)
+		GUICtrlSetState($inp_scan2, $GUI_DISABLE)
+		GUICtrlSetState($lab_scanid1, $GUI_DISABLE)
+		GUICtrlSetState($lab_scanid2, $GUI_DISABLE)
+
+		If $sim = $GUI_Unchecked Then
+			GUICtrlSetState($check_scan, $GUI_ENABLE)
+		Else
+			GUICtrlSetState($check_scan, $GUI_DISABLE)
+		EndIf
+	EndIf
+
+EndFunc
+Func UpdateGUIState()
+    Local $sim = GUICtrlRead($check_simulation)
+    Local $map = GUICtrlRead($check_map)
+    Local $scan = GUICtrlRead($check_scan)
+
+    ; Default: disable everything
+    GUICtrlSetState($inp_map1, $GUI_DISABLE)
+    GUICtrlSetState($inp_map2, $GUI_DISABLE)
+    GUICtrlSetState($inp_map3, $GUI_DISABLE)
+    GUICtrlSetState($lab_mapid1, $GUI_DISABLE)
+    GUICtrlSetState($lab_mapid2, $GUI_DISABLE)
+    GUICtrlSetState($lab_mapid3, $GUI_DISABLE)
+
+    GUICtrlSetState($inp_scan1, $GUI_DISABLE)
+    GUICtrlSetState($inp_scan2, $GUI_DISABLE)
+    GUICtrlSetState($lab_scanid1, $GUI_DISABLE)
+    GUICtrlSetState($lab_scanid2, $GUI_DISABLE)
+
+    ; Main logic
+    If $sim = $GUI_Checked Then
+        GUICtrlSetState($check_scan, $GUI_DISABLE)
+
+        If $map = $GUI_Checked Then
+            GUICtrlSetState($inp_map3, $GUI_ENABLE)
+            GUICtrlSetState($lab_mapid3, $GUI_ENABLE)
+        EndIf
+
+    Else ; simulation UNCHECKED
+        GUICtrlSetState($check_scan, $GUI_ENABLE)
+
+        If $map = $GUI_Checked Then
+            GUICtrlSetState($inp_map1, $GUI_ENABLE)
+            GUICtrlSetState($inp_map2, $GUI_ENABLE)
+            GUICtrlSetState($inp_map3, $GUI_ENABLE)
+            GUICtrlSetState($lab_mapid1, $GUI_ENABLE)
+            GUICtrlSetState($lab_mapid2, $GUI_ENABLE)
+            GUICtrlSetState($lab_mapid3, $GUI_ENABLE)
+        EndIf
+
+        If $scan = $GUI_Checked Then
+            GUICtrlSetState($inp_scan1, $GUI_ENABLE)
+            GUICtrlSetState($inp_scan2, $GUI_ENABLE)
+            GUICtrlSetState($lab_scanid1, $GUI_ENABLE)
+            GUICtrlSetState($lab_scanid2, $GUI_ENABLE)
+        EndIf
+    EndIf
 EndFunc
 
 Func _execute()
