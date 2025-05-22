@@ -31,9 +31,9 @@ Func Terminate ()
 EndFunc
 #Region ### GUI definition $gui_task ###
 Opt("GUIOnEventMode",1)
-$gui_task = GUICreate("Detection System Task Selector", 480, 389, 500, 200)
+$gui_task = GUICreate("Detection System Task Selector", 550, 400, 500, 200)
 GUISetBkColor(0x99B4D1)
-GUICtrlCreateLabel("Please provide the Aruco marker ID's as placed,from left to right.",48,20,600,50)
+GUICtrlCreateLabel("Please provide the Aruco marker ID's as placed, from left to right.",48,20,600,50)
 GUICtrlSetFont(-1, 12, 300, 0, "MS Sans Serif")
 ;____________________________________SCAN Display________________________________________
 $check_scan = GUICtrlCreateCheckbox("Scan Display", 48, 60, 161, 33)
@@ -69,23 +69,23 @@ $lab_mapid2 = GUICtrlCreateLabel("2. ID", 250, 152, 38, 24)
 GUICtrlSetFont(-1, 12, 400, 0, "MS Sans Serif")
 GUICtrlSetColor(-1, 0x000000)
 
-$lab_mapid3 = GUICtrlCreateLabel("3. ID = Table marker", 250, 192, 38, 24)
+$lab_mapid3 = GUICtrlCreateLabel("Table marker", 250, 192, 100, 24)
 GUICtrlSetFont(-1, 12, 400, 0, "MS Sans Serif")
 GUICtrlSetColor(-1, 0x000000)
 
-$inp_map1 = GUICtrlCreateInput("", 300, 112, 65, 21, $ES_Number)
+$inp_map1 = GUICtrlCreateInput("", 350, 112, 65, 21, $ES_Number)
 GUICtrlSetState(-1, $GUI_disable)
 
-$inp_map2 = GUICtrlCreateInput("", 300, 152, 65, 21, $ES_Number)
+$inp_map2 = GUICtrlCreateInput("", 350, 152, 65, 21, $ES_Number)
 GUICtrlSetState(-1, $GUI_disable)
 
-$inp_map3 = GUICtrlCreateInput("", 300, 192, 65, 21, $ES_Number)
+$inp_map3 = GUICtrlCreateInput("", 350, 192, 65, 21, $ES_Number)
 GUICtrlSetState(-1, $GUI_disable)
 ;__________________________________Simulation Mode______________________________________
 $check_simulation = GUICtrlCreateCheckbox("Simulation Mode", 128, 240, 161, 33)
 GUICtrlSetFont(-1, 12, 800, 0, "MS Sans Serif")
 GUICtrlSetColor(-1, 0x000000)
-GUICtrlSetOnEvent(-1,"_scan")
+;GUICtrlSetOnEvent(-1,"_scan")
 ;__________________________________________________________________________________________
 $but_exe = GUICtrlCreateButton("execute", 128, 288, 177, 41)
 GUICtrlSetFont(-1, 12, 400, 0, "MS Sans Serif")
