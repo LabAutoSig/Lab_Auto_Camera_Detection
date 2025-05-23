@@ -23,6 +23,7 @@
 #include <GUIConstantsEx.au3>
 #include <StaticConstants.au3>
 #include <WindowsConstants.au3>
+#include <FileConstants.au3>
 #include <Array.au3>
 #include "Horst_implementation.au3"
 HotKeySet("{ESC}", "Terminate") ;Define the script exit key
@@ -172,7 +173,16 @@ Func UpdateGUIState()
         GUICtrlSetState($lab_scanid2, $GUI_ENABLE)
     EndIf
 EndFunc
-
+Func SaveTableMarker()
+	Local $table_marker = GUICtrlRead($inp_map3)
+	Local $hFile = FileOpen(@ScriptDir & "\three_D_reconstruction\marker_placement.txt", $FO_OVERWRITE)
+    If $hFile = -1 Then
+        MsgBox(16, "Error", "Failed to open file.")
+        Return
+    EndIf
+    FileWrite($hFile, $table_marker & @CRLF)
+    FileClose($hFile)
+EndFunc
 Func _execute()
 	If GUICtrlRead($check_simulation) = $GUI_Checked Then ;Execute AutoIt script without robotic arm usage
 		If GUICtrlRead($check_scan) = $GUI_Checked Then
@@ -182,6 +192,8 @@ Func _execute()
 
 		ElseIf GUICtrlRead($check_map) = $GUI_Checked Then
 			GUISetState(@SW_HIDE)
+
+			SaveTableMarker()
 			reconstruction()
 			end()
 		EndIf
@@ -227,12 +239,13 @@ EndFunc
 Func displaydetection()
     Local $basePath = @ScriptDir
     Local $venvPath = $basePath & "\Python_installation\venv311\Scripts\activate"
-    Run(@ComSpec & ' /k "cd /d ' & $basePath & '\Python_installation && ' & $venvPath & ' && cd /d ' & $basePath & ' && displaydetection.py"', $basePath)
+    Run(@ComSpec & ' /c "cd /d ' & $basePath & '\Python_installation && ' & $venvPath & ' && cd /d ' & $basePath & ' && displaydetection.py"', $basePath)
 EndFunc
 
 Func reconstruction()
 	Local $basePath = @ScriptDir
     Local $venvPath = $basePath & "\Python_installation\venv38\Scripts\activate"
-    Run(@ComSpec & ' /k "cd /d ' & $basePath & '\Python_installation && ' & $venvPath & ' && cd /d ' & $basePath & ' && reconstruction.py"', $basePath)
+    Run(@ComSpec & ' /c "cd /d ' & $basePath & '\Python_installation && ' & $venvPath & ' && cd /d ' & $basePath & ' && reconstruction.py"', $basePath)
+
 	EndFunc
 #EndRegion

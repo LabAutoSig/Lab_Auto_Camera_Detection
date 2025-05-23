@@ -346,17 +346,17 @@ def getCoords(ids,num_ids,table_marker_id, coords_3d, new_tvecs, rvecs, marker_l
         #______________________________________________________________
         #ID of the table marker has to be known for this state of the code
         #______________________________________________________________
-        if id1 == table_marker_id: #identify marker with the value 23
+        if id1 == table_marker_id: #identify table marker
             #id1 = table marker --> distance between id2/id3 and id1 for height
             print(f"ID{id1} = table marker")
             box_coords = sort_ArUco_placement(lu_id2,ll_id2,ru_id2,rl_id2,lu_id3,ll_id3,ru_id3,rl_id3, id2, id3)
             box_coords.append(coord1) #append table marker coordinates
-        elif id2 == table_marker_id: #identify marker with the value 23
+        elif id2 == table_marker_id: #identify table marker
             #id2 = table marker --> distance between id1/id3 and id2 = height
             print(f"ID{id2} = table marker")
             box_coords = sort_ArUco_placement(lu_id1,ll_id1,ru_id1,rl_id1,lu_id3,ll_id3,ru_id3,rl_id3, id1, id3)
             box_coords.append(coord2) #append table marker coordinates
-        elif id3 == table_marker_id: #identify marker with the value 23
+        elif id3 == table_marker_id: #identify table marker
             #id3 = table marker --> distance between id1/id2 and id3 = height
             print(f"ID{id3} = table marker")
             box_coords = sort_ArUco_placement(lu_id1,ll_id1,ru_id1,rl_id1,lu_id2,ll_id2,ru_id2,rl_id2, id1, id2)

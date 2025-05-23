@@ -1,0 +1,7 @@
+id1,id2,output_path,unit1,unit2,title_device,axis_device
+4,1,display_detection/vwr_cenrtifuge.xlsx,RPM/RCF*1000,min,VWR MicroStar 12 centrifuge,RPM/RCF*1000
+42,161,display_detection/kern_scale.xlsx,g,,Scales KERN FCE 3K1N,g
+5,8,display_detection/cs_series_scale.xlsx,g,,Scales CS Series CS200,g
+2,314,display_detection/thermo_scientific_drybath.xlsx,°C,°C,Thermo Scientific Digital Shaking Drybath 88880028,°C
+2,1,display_detection/heating_stirring_phoenix.xlsx,°C,1/min,Phoenix Instrument Heating and magnetic stirrer RSM-10HP,°C
+3,4,display_detection/XSInstruments_pH.xlsx,pH,°C,XSInstruments pH 50+ DHS S/N180356077,pH

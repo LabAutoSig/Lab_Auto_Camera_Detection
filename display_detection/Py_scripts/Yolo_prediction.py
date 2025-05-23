@@ -13,7 +13,7 @@ import display_detection.Py_scripts.Point_handling as point_h
 import display_detection.Py_scripts.Row_handling as row_h
 import display_detection.Py_scripts.Bbox_handling as bbox_h
 import display_detection.Py_scripts.Data_control as d_control
-from display_detection.Py_scripts.Data_postprocessing import data_processing_excel
+from display_detection.Py_scripts.Data_postprocessing_new import data_processing_excel
 from display_detection.Py_scripts.Image_enhancer import run_image_enhancer
 #______________________________________________
 #Function that predicts the values in an image

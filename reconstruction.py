@@ -5,7 +5,7 @@
 import sys 
 #Aruco marker and data handling libraries
 import cv2
-import cv2.aruco as aruco 
+from cv2 import aruco 
 import numpy as np
 import sys
 import os
@@ -100,7 +100,7 @@ def main():
     img_rs1 = cv2.resize(image_axis1,(900,900))
     cv2.imshow("Axis Image1",img_rs1)
     print("Finished lab mapping.")
-    cv2.waitKey(30000)  # Wait for 30 seconds (30000 milliseconds)
+    cv2.waitKey(3000)  # Wait for 30 seconds (30000 milliseconds)
     cv2.destroyAllWindows() #end the script
     return
 def run_with_error_handling():

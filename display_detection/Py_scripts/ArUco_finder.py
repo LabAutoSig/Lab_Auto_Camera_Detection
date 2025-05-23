@@ -56,7 +56,6 @@ def findArucoMarkers(img,img_folder_path, id_list, totalMarkers=1000, draw = Fal
         
     else:
         #print(ids)
-
         #Draw bounding box around marker
         if draw:
             aruco.drawDetectedMarkers(image, bboxs, ids) #Draw image with detected ids and bboxs
